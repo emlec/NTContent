@@ -2,6 +2,9 @@
 
 # Requirements
 
+- gcc
+- zlib
+
 # Compilation
 
 # Usage
