@@ -5,7 +5,7 @@ CFLAGS = -c -O3 -Wall
 LDFLAGS = -lz
 BINDIR = ../bin/
 EXEC = NTContent
-OBJS = $(addsuffix .o, NTContent sequence parameters utils)
+OBJS = $(addsuffix .o, NTContent sequence printNTContent parameters utils)
 
 all: ${BINDIR} $(addprefix ${BINDIR}, ${EXEC})
 
@@ -21,7 +21,8 @@ $(addprefix ${BINDIR}, NTContent): ${OBJS}
 clean:
 	rm -f $(addprefix ${BINDIR}, ${EXEC}) *.o
 
-NTContent.o: utils.h parameters.h sequence.h
+NTContent.o: utils.h parameters.h sequence.h printNTContent.h
 sequence.o: utils.h parameters.h sequence.h
+printNTContent.o: utils.h parameters.h printNTContent.h
 parameters.o: utils.h parameters.h
 utils.o: utils.h

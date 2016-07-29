@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <time.h>
 #include "parameters.h"
 
 AppParamPtr initApp(float version)
@@ -50,7 +49,7 @@ FILE* openOutFile(char* filename)
     if (!strcmp(filename, "stdout")) out = stdout;
     else if (!strcmp(filename, "stderr")) out = stderr;
     else if (!strcmp(filename, "stdin")) out = stdout;
-    else out = safeFOpen(optarg, "w");
+    else out = safeFOpen(filename, "w");
     return out;
 }
 
@@ -128,22 +127,4 @@ void autoParam(AppParamPtr app)
         app->step = app->windowSize / 2;
     if (app->step < 1)
         app->step = 1;
-}
-
-void printHeader(AppParamPtr app)
-{
-    char* timeStr = (char*) safeCalloc(129, sizeof(char));
-    time_t rawtime = time(NULL);
-    struct tm* date = gmtime(&rawtime);
-
-    strftime(timeStr, 128, "%a %d %b %Y %X %Z", date);
-
-    fprintf(app->out, "# NTContent %.1f\t%s\n", app->version, timeStr);
-    fprintf(app->out, "# %s\n", app->commandLine);
-    fprintf(app->out, "# Query sequence: %s\t", app->sequence->name);
-    fprintf(app->out, "%d:%d\tLength: %lu\n", app->sequence->from, app->sequence->to, app->sequence->length);
-    fprintf(app->out, "# Query nucleotide(s): %s\n", app->nuclInput);
-    fprintf(app->out, "# Position\t%%NT\n");
-
-    free(timeStr);
 }

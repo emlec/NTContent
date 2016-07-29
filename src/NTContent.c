@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include <getopt.h>
 #include "sequence.h"
+#include "printNTContent.h"
 
 #define VERSION 0.1
 
@@ -36,35 +37,11 @@ static void usage(FILE* out)
     fprintf(out, " --step           | -s INT        Step\n");
     fprintf(out, " --windowSize     | -w INT        Window Size\n");
     fprintf(out, " --nucleotide     | -n STR        Nucleotide(s) to look for [ACGTUWSMKRYBDHVNZ] (default: GC)\n");
-    fprintf(out, " --region         | -r STR        Region of interest 'FROM:TO'\n");
+    fprintf(out, " --region         | -r STR        Region of interest [FROM:TO]\n");
+    fprintf(out, " --plot           | -p            Create a gnuplot script\n");
+    fprintf(out, " --depth          | -d            Combine 'samtools depth' results with NTContent in the gnuplot script\n");
     fprintf(out, " --help           | -h            Get help (this screen)\n");
     fprintf(out, "\n");
-}
-
-void NTContent(AppParamPtr app)
-{
-    int nt = 0, pos = 0, i = 0, windowCenter;
-
-    windowCenter = app->windowSize < 2 ? 1 : app->windowSize / 2;
-
-    for (pos = 0; pos < app->sequence->length - app->windowSize + 1; pos += app->step)
-    {
-        nt = 0;
-        for (i = 0; i < app->windowSize; i++)
-        {
-            switch (app->sequence->seq[pos+i])
-            {
-                case 'A': case 'a': if (app->nucleotide & ADENINE) nt++; break;
-                case 'C': case 'c': if (app->nucleotide & CYTOSINE) nt++; break;
-                case 'G': case 'g': if (app->nucleotide & GUANINE) nt++; break;
-                case 'T': case 't': if (app->nucleotide & THYMINE_URACIL) nt++; break;
-                case 'U': case 'u': if (app->nucleotide & THYMINE_URACIL) nt++; break;
-                default: ERROR("Unrecognized nucleotide in the sequence", exit(1));
-            }
-        }
-
-        fprintf(app->out, "%d\t%.2f\n", pos + app->sequence->from + windowCenter -1, (float)nt * 100 / (float)app->windowSize);
-    }
 }
 
 int main(int argc, char** argv)
@@ -78,6 +55,8 @@ int main(int argc, char** argv)
         {"windowSize", required_argument, 0, 'w'},
         {"nucleotide", required_argument, 0, 'n'},
         {"region", required_argument, 0, 'r'},
+        {"plot", no_argument, 0, 'p'},
+        {"depth", no_argument, 0, 'd'},
         {"help", no_argument, 0, 'h'},
         {0, 0, 0, 0}
     };
@@ -92,7 +71,7 @@ int main(int argc, char** argv)
     app = initApp(VERSION);
 
     // Get program options
-    while ((c = getopt_long(argc, argv,"o:s:w:n:r:h", long_options, &option_index)) != -1)
+    while ((c = getopt_long(argc, argv,"o:s:w:n:r:pdh", long_options, &option_index)) != -1)
     {
         switch (c)
         {
@@ -101,11 +80,16 @@ int main(int argc, char** argv)
             case 'w': app->windowSize = (size_t) strtol(optarg, NULL, 10); break;       // Window Size
             case 'n': app->nucleotide = parseNucl(app, optarg); break;                  // Nucleotide(s) to look for
             case 'r': parseRegion(app->sequence, optarg); break;                        // Region of interest
+            case 'p': app->plot = 1; break;                                             // Create a gnuplot script file
+            case 'd': app->depth = 1; break;                                            // Create a gnuplot script file with depth
             case 'h': usage(stderr); clearApp(app); return EXIT_SUCCESS; break;         // Help
             case ':': fprintf(stderr, "Option -%c requires an argument\n", optopt); return EXIT_FAILURE; break;
             case '?': fprintf(stderr, "Option -%c is undefined\n", optopt); return EXIT_FAILURE; break;
         }
     }
+
+    if (app->depth && !app->plot)
+        ERROR("To create a plot, -p need to be used", app->depth = 0);
 
     // Set default values
     if (app->out == NULL) app->out = stdout;
@@ -130,9 +114,10 @@ int main(int argc, char** argv)
 
     analyzeSeq(app->sequence);
     autoParam(app);
-    printHeader(app);
 
+    printHeader(app);
     NTContent(app);
+    if (app->plot) printPlotScript(app);
 
     clearApp(app);
     return EXIT_SUCCESS;

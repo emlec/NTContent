@@ -22,46 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PARAMETERS_H_INCLUDED
-#define PARAMETERS_H_INCLUDED
+#ifndef PRINTNTCONTENT_H_INCLUDED
+#define PRINTNTCONTENT_H_INCLUDED
 
-#include "utils.h"
+#include "parameters.h"
 
-#define ADENINE            0x1
-#define CYTOSINE           0x2
-#define GUANINE            0x4
-#define THYMINE_URACIL     0x8
+void printHeader(AppParamPtr app);
+void NTContent(AppParamPtr app);
+void printPlotScript(AppParamPtr app);
 
-typedef struct Sequence
-{
-    int from;
-    int to;
-    size_t length;
-    char* filename;
-    char* seq;
-    char* name;
-    gzFile fp;
-}Sequence, *SequencePtr;
-
-typedef struct AppParam
-{
-    size_t step;
-    size_t windowSize;
-    int nucleotide;
-    int plot;
-    int depth;
-    float version;
-    char* commandLine;
-    char* nuclInput;
-    FILE* out;
-    SequencePtr sequence;
-}AppParam, *AppParamPtr;
-
-AppParamPtr initApp(float version);
-void clearApp(AppParamPtr app);
-FILE* openOutFile(char* filename);
-int parseNucl(AppParamPtr app, char* input);
-void parseRegion(SequencePtr seq, char* input);
-void autoParam(AppParamPtr app);
-
-#endif // PARAMETERS_H_INCLUDED
+#endif // PRINTNTCONTENT_H_INCLUDED
