@@ -117,7 +117,7 @@ void parseRegion(SequencePtr seq, char* input)
 void autoParam(AppParamPtr app)
 {
     if (!app->windowSize)
-        app->windowSize = app->sequence->length / 100;
+        app->windowSize = app->sequence->length / 50;
     if (app->windowSize < 1)
         app->windowSize = 1;
     if (app->windowSize > app->sequence->length)

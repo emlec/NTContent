@@ -50,6 +50,7 @@ typedef struct AppParam
     int nucleotide;
     int plot;
     int depth;
+    int region;
     float version;
     char* commandLine;
     char* nuclInput;

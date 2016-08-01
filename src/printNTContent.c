@@ -39,6 +39,7 @@ void printHeader(AppParamPtr app)
     fprintf(app->out, "# Query sequence: %s\t", app->sequence->name);
     fprintf(app->out, "%d:%d\tLength: %lu\n", app->sequence->from, app->sequence->to, app->sequence->length);
     fprintf(app->out, "# Query nucleotide(s): %s\n", app->nuclInput);
+    fprintf(app->out, "# Parameters: window_size: %lu\tstep: %lu\n", app->windowSize, app->step);
     fprintf(app->out, "# Position\t%%%s\n", app->nuclInput);
 
     free(timeStr);
@@ -74,12 +75,20 @@ void printPlotScript(AppParamPtr app)
     FILE* plotScript = NULL;
     size_t seqNameLength = strlen(app->sequence->filename);
     size_t nuclInputLength = strlen(app->nuclInput);
-    char* filename = (char*) safeCalloc(seqNameLength + nuclInputLength + 20, sizeof(char));
+    int fromLength = snprintf(NULL, 0, "%d", app->sequence->from);
+    int toLength = snprintf(NULL, 0, "%d", app->sequence->to);
+    char* filename = filename = (char*)safeCalloc(seqNameLength + nuclInputLength + fromLength + toLength + 22, sizeof(char));
 
     if (app->depth)
-        sprintf(filename, "%s.%s_content.depth.plt", app->sequence->filename, app->nuclInput);
+        if (app->region)
+            sprintf(filename, "%s.%s_content.depth_%d-%d.plt", app->sequence->filename, app->nuclInput, app->sequence->from, app->sequence->to);
+        else
+            sprintf(filename, "%s.%s_content.depth.plt", app->sequence->filename, app->nuclInput);
     else
-        sprintf(filename, "%s.%s_content.plt", app->sequence->filename, app->nuclInput);
+        if (app->region)
+            sprintf(filename, "%s.%s_content_%d-%d.plt", app->sequence->filename, app->nuclInput, app->sequence->from, app->sequence->to);
+        else
+            sprintf(filename, "%s.%s_content.plt", app->sequence->filename, app->nuclInput);
 
     plotScript = safeFOpen(filename, "w");
     free(filename);
@@ -91,7 +100,7 @@ void printPlotScript(AppParamPtr app)
     fprintf(plotScript, "set yrange [0:100]\n");
     fprintf(plotScript, "set style data lines\n");
     fprintf(plotScript, "set output ARG1\n");
-    fprintf(plotScript, "set title \'%s %d:%d\'\n", app->sequence->name, app->sequence->from, app->sequence->to);
+    fprintf(plotScript, "set title \'%s %d:%d\' noenhanced\n", app->sequence->name, app->sequence->from, app->sequence->to);
 
     if (app->depth)
     {
