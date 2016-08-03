@@ -50,10 +50,10 @@ typedef struct AppParam
     int nucleotide;
     int plot;
     int depth;
-    int region;
     float version;
     char* commandLine;
     char* nuclInput;
+    char* regionInput;
     FILE* out;
     SequencePtr sequence;
 }AppParam, *AppParamPtr;
@@ -62,7 +62,7 @@ AppParamPtr initApp(float version);
 void clearApp(AppParamPtr app);
 FILE* openOutFile(char* filename);
 int parseNucl(AppParamPtr app, char* input);
-void parseRegion(SequencePtr seq, char* input);
+void parseRegion(AppParamPtr app, char* input);
 void autoParam(AppParamPtr app);
 
 #endif // PARAMETERS_H_INCLUDED

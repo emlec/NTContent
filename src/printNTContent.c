@@ -70,6 +70,13 @@ void NTContent(AppParamPtr app)
     }
 }
 
+static char* compatibleRegionName(char* regionInput)
+{
+    char* p = strpbrk(regionInput, ":");
+    *p = '-';
+    return regionInput;
+}
+
 void printPlotScript(AppParamPtr app)
 {
     FILE* plotScript = NULL;
@@ -79,16 +86,20 @@ void printPlotScript(AppParamPtr app)
     int toLength = snprintf(NULL, 0, "%d", app->sequence->to);
     char* filename = filename = (char*)safeCalloc(seqNameLength + nuclInputLength + fromLength + toLength + 22, sizeof(char));
 
-    if (app->depth)
-        if (app->region)
-            sprintf(filename, "%s.%s_content.depth_%d-%d.plt", app->sequence->filename, app->nuclInput, app->sequence->from, app->sequence->to);
+    if (app->regionInput != NULL)
+    {
+        if (app->depth)
+            sprintf(filename, "%s.%s_content.depth_%s.plt", app->sequence->filename, app->nuclInput, compatibleRegionName(app->regionInput));
         else
-            sprintf(filename, "%s.%s_content.depth.plt", app->sequence->filename, app->nuclInput);
+            sprintf(filename, "%s.%s_content_%s.plt", app->sequence->filename, app->nuclInput, compatibleRegionName(app->regionInput));
+    }
     else
-        if (app->region)
-            sprintf(filename, "%s.%s_content_%d-%d.plt", app->sequence->filename, app->nuclInput, app->sequence->from, app->sequence->to);
+    {
+        if (app->depth)
+            sprintf(filename, "%s.%s_content.depth.plt", app->sequence->filename, app->nuclInput);
         else
             sprintf(filename, "%s.%s_content.plt", app->sequence->filename, app->nuclInput);
+    }
 
     plotScript = safeFOpen(filename, "w");
     free(filename);

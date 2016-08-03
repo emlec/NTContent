@@ -79,7 +79,7 @@ int main(int argc, char** argv)
             case 's': app->step = (size_t) strtol(optarg, NULL, 10); break;             // Step
             case 'w': app->windowSize = (size_t) strtol(optarg, NULL, 10); break;       // Window Size
             case 'n': app->nucleotide = parseNucl(app, optarg); break;                  // Nucleotide(s) to look for
-            case 'r': parseRegion(app->sequence, optarg); app->region = 1; break;       // Region of interest
+            case 'r': parseRegion(app, optarg); break;                                  // Region of interest
             case 'p': app->plot = 1; break;                                             // Create a gnuplot script file
             case 'd': app->depth = 1; break;                                            // Create a gnuplot script file with depth
             case 'h': usage(stderr); clearApp(app); return EXIT_SUCCESS; break;         // Help

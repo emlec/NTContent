@@ -87,24 +87,27 @@ int parseNucl(AppParamPtr app, char* input)
     return nucl;
 }
 
-void parseRegion(SequencePtr seq, char* input)
+void parseRegion(AppParamPtr app, char* input)
 {
-    char* p = NULL;
     size_t lenInput = strlen(input);
     char* str = (char*) safeCalloc(lenInput, sizeof(char));
+    char* p = NULL;
     int temp = 0;
+    SequencePtr seq = app->sequence;
 
     if (input == NULL) ERROR("Wrong region parameter", exit(1));
 
+    app->regionInput = input;
+
     strncpy(str, input, lenInput);
-    p = strpbrk(str,":");
+    p = strpbrk(str, ":");
     if (p == NULL) ERROR("Wrong region parameter", exit(1));
 
     *p = '\0';
 
     seq->from = (int) strtol(str, NULL, 10);
     if (strlen(str) != lenInput -1)
-        seq->to = (int) strtol(p+1, NULL, 10);
+        seq->to = (int) strtol(p + 1, NULL, 10);
     if (seq->to > 0 && seq->from > seq->to)
     {
         temp = seq->from;
@@ -117,14 +120,14 @@ void parseRegion(SequencePtr seq, char* input)
 void autoParam(AppParamPtr app)
 {
     if (!app->windowSize)
-        app->windowSize = app->sequence->length / 50;
+        app->windowSize = app->sequence->length / 25;
     if (app->windowSize < 1)
         app->windowSize = 1;
     if (app->windowSize > app->sequence->length)
         app->windowSize = app->sequence->length;
 
     if (!app->step)
-        app->step = app->windowSize / 2;
+        app->step = app->windowSize / 10;
     if (app->step < 1)
         app->step = 1;
 }
