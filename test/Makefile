@@ -1,8 +1,8 @@
 .PHONY = all clean destroy
 .SHELL = /bin/bash
-GNUPLOT = ~/Programs/gnuplot-5.0.3/src/gnuplot
-BINDIR = ~/Programs/NTContent/bin
-SRCDIR = ~/Programs/NTContent/src
+GNUPLOT = gnuplot
+BINDIR = ../bin
+SRCDIR = ../src
 SEQ =
 NUCL = GC
 WINDOWSIZE = 0
